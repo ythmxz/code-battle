@@ -1,7 +1,7 @@
 #ifndef INVENTARIO_H
 #define INVENTARIO_H
 
-/// @file list.h
+/// @file inventario.h
 /// @brief Definições e funções para o inventário de itens.
 
 /// @brief Estrutura de um item no inventário.

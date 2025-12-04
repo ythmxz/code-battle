@@ -1,9 +1,9 @@
 #ifndef HISTORICO_H
 #define HISTORICO_H
 
-#include "../tree.h"
+#include "../mundo.h"
 
-/// @file stack.h
+/// @file historico.h
 /// @brief Definições e funções para o histórico de ações.
 
 /// @brief Estrutura de uma ação no histórico.
