@@ -40,7 +40,7 @@ void destruirJogador(Jogador *jogador) {
 }
 
 void imprimirJogador(Jogador *jogador) {
-    printf("\n=== Status: %s (J%d) ===\n", jogador->nome, jogador->id);
+    printf("Status: %s (J%d)\n", jogador->nome, jogador->id);
     printf("Território: %s\n", jogador->atual->nome);
     printf("Ataque: %d\n", ataque(jogador));
     printf("Escudos: %d\n", escudos(jogador));
@@ -51,9 +51,9 @@ void imprimirJogador(Jogador *jogador) {
 }
 
 int ataque(Jogador *jogador) {
-    return contarItem(jogador->inventario, "espada");
+    return contarItem(jogador->inventario, "Espada");
 }
 
 int escudos(Jogador *jogador) {
-    return contarItem(jogador->inventario, "escudo");
+    return contarItem(jogador->inventario, "Escudo");
 }

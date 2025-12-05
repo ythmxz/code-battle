@@ -14,8 +14,6 @@ O jogo CodeBattle simula um mundo representado por uma árvore binária completa
 posições opostas (nós folha) e devem subir até o nó raiz (chamado de Núcleo-X ), coletando recursos
 e enfrentando desafios no caminho.
 
-![alt text](<mapa.png>)
-
 ## Estrutura da Árvore
 
 A árvore binária será criada dinamicamente utilizando alocação de memória. Cada nó da árvore é

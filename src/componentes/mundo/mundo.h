@@ -35,38 +35,38 @@ Territorio *criarMundo();
 /// @param territorioPai Ponteiro para o território pai
 void configurarPonteirosMundo(Territorio *territorio, Territorio *territorioPai);
 
-/// @brief
-/// @param territorio
-/// @return
+/// @brief Busca o território mais à esquerda.
+/// @param territorio Ponteiro para o território raiz da busca
+/// @return Ponteiro para o território mais à esquerda
 Territorio *buscarBaseEsquerda(Territorio *territorio);
 
-/// @brief
-/// @param territorio
-/// @return
+/// @brief Busca o território mais à direita.
+/// @param territorio Ponteiro para o território raiz da busca
+/// @return Ponteiro para o território mais à direita
 Territorio *buscarBaseDireita(Territorio *territorio);
 
-/// @brief
-/// @param territorio
-/// @param chave
-/// @return
-Territorio *buscarChave(Territorio *territorio, int chave); // chave = 1 ou 2 (primeira ou segunda)
+/// @brief Busca o território CHAVE especificado.
+/// @param territorio Ponteiro para o território raiz da busca
+/// @param chave Número da chave (1 ou 2)
+/// @return Ponteiro para o território da chave especificada
+Territorio *buscarChave(Territorio *territorio, int chave);
 
-/// @brief
-/// @param territorio
-/// @param nucleo
-/// @return
-int nivelTerritorio(Territorio *territorio, Territorio *nucleo); // retorna nível do nó (0=raiz, 3=folhas)
+/// @brief Calcula o nível de um território na árvore.
+/// @param territorio Ponteiro para o território alvo
+/// @param nucleo Ponteiro para o território raiz (Núcleo-X)
+/// @return Nível do território (0 = Raiz, 3 = Folhas)
+int nivelTerritorio(Territorio *territorio, Territorio *nucleo);
 
-/// @brief
-/// @param territorio
-/// @param atual
-/// @return
+/// @brief Busca o território irmão à esquerda no mesmo nível.
+/// @param territorio Ponteiro para o território raiz da busca
+/// @param atual Ponteiro para o território atual
+/// @return Ponteiro para o território irmão à esquerda
 Territorio *buscarIrmaoEsquerda(Territorio *territorio, Territorio *atual);
 
-/// @brief
-/// @param territorio
-/// @param atual
-/// @return
+/// @brief Busca o território irmão à direita no mesmo nível.
+/// @param territorio Ponteiro para o território raiz da busca
+/// @param atual Ponteiro para o território atual
+/// @return Ponteiro para o território irmão à direita
 Territorio *buscarIrmaoDireita(Territorio *territorio, Territorio *atual);
 
 /// @brief Imprime a estrutura do mundo a partir de um território.

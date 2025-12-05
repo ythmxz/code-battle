@@ -3,52 +3,19 @@
 #include <string.h>
 #include <time.h>
 
-#include "player.h"
-#include "tads/list.h"
-#include "tads/stack.h"
-#include "tree.h"
-
-// Detecção de plataforma
-#ifdef _WIN32
-#include <windows.h>
-#define LIMPAR_TELA "cls"
-#else
-#include <unistd.h>
-#define LIMPAR_TELA "clear"
-#endif
-
-// Cores da interface
-#define COR_RESET "\033[0m"
-#define COR_VERMELHO "\033[1;31m"
-#define COR_VERDE "\033[1;32m"
-#define COR_AMARELO "\033[1;33m"
-#define COR_AZUL "\033[1;34m"
-#define COR_MAGENTA "\033[1;35m"
-#define COR_CIANO "\033[1;36m"
-#define COR_BRANCO "\033[1;37m"
+#include "componentes/historico/historico.h"
+#include "componentes/inventario/inventario.h"
+#include "componentes/jogador/jogador.h"
+#include "componentes/mundo/mundo.h"
+#include "utils/terminal/terminal.h"
 
 #define LIMITE_TURNOS 100
 
-No *raiz_global = NULL;
-No *chave1_global = NULL;
-No *chave2_global = NULL;
+Territorio *raiz_global = NULL;
+Territorio *chave1_global = NULL;
+Territorio *chave2_global = NULL;
 
-void limpar_tela() {
-    system(LIMPAR_TELA);
-}
-
-void limpar_buffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
-}
-
-void pressionar_enter() {
-    printf("\n%s[Pressione ENTER para continuar]%s\n", COR_CIANO, COR_RESET);
-    getchar();
-}
-
-int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
+int tentar_movimento(Territorio *destino, Jogador *jogador, Jogador *adversario) {
     if (destino == NULL) {
         printf("%sMOVIMENTO INVÁLIDO%s\n", COR_VERMELHO, COR_RESET);
         printf("%sO destino não existe.%s\n", COR_VERMELHO, COR_RESET);
@@ -77,7 +44,7 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
         printf("%sCOMBATE%s\n", COR_AZUL, COR_RESET);
         printf("O território '%s' está ocupado por J%d!\n", destino->nome, destino->ocupado);
         printf("%sEscudo: %d%s\n", COR_VERDE, destino->escudo, COR_RESET);
-        printf("%sAtaque: %d%s\n", COR_VERDE, jogador_ataque(jogador), COR_RESET);
+        printf("%sAtaque: %d%s\n", COR_VERDE, ataque(jogador), COR_RESET);
 
         if (destino->escudo == 0) {
             printf("%sCONQUISTADO%s\n", COR_VERDE, COR_RESET);
@@ -98,7 +65,7 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
             destino->ocupado = jogador->id;
         }
 
-        else if (jogador_ataque(jogador) >= destino->escudo) {
+        else if (ataque(jogador) >= destino->escudo) {
             printf("%sCONQUISTADO%s\n", COR_VERDE, COR_RESET);
             printf("%sVocê superou as defesas do território!%s\n", COR_VERDE, COR_RESET);
 
@@ -126,9 +93,9 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
         }
     }
 
-    printf("%sJOGADOR %d se movimentou de '%s' para '%s'.\n", COR_CIANO, jogador->id, jogador->atual->nome, destino->nome, COR_RESET);
+    printf("%sJOGADOR %d se movimentou de '%s' para '%s'.%s\n", COR_CIANO, jogador->id, jogador->atual->nome, destino->nome, COR_RESET);
 
-    pilha_empilhar(jogador->historico, jogador->atual);
+    empilharHistorico(jogador->historico, jogador->atual);
     jogador->atual = destino;
     destino->ocupado = jogador->id;
 
@@ -147,7 +114,7 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
     }
 
     if (destino->tipo == RECURSO) {
-        int nivel = calcular_nivel(raiz_global, destino);
+        int nivel = nivelTerritorio(destino, raiz_global);
 
         // Recursos melhores e em maior quantidade em níveis altos (próximo da raiz)
         printf("%sRECURSO%s\n", COR_AZUL, COR_RESET);
@@ -160,7 +127,7 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
                 const char *recursos[] = {"espada", "espada", "espada", "escudo", "escudo"};
                 const char *rec = recursos[rand() % 5];
                 printf("+ %s\n", rec);
-                lista_adicionar(jogador->inventario, rec);
+                adicionarItem(jogador->inventario, rec);
             }
         } else if (nivel == 2) {
             // Nível 2: 1-2 recursos
@@ -170,14 +137,14 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
                 const char *recursos[] = {"espada", "escudo", "escudo"};
                 const char *rec = recursos[rand() % 3];
                 printf("+ %s\n", rec);
-                lista_adicionar(jogador->inventario, rec);
+                adicionarItem(jogador->inventario, rec);
             }
         } else {
             // Nível 3: 1 recurso
             const char *recursos[] = {"espada", "escudo"};
             const char *rec = recursos[rand() % 2];
             printf("Coletando:\n\n+%s\n", rec);
-            lista_adicionar(jogador->inventario, rec);
+            adicionarItem(jogador->inventario, rec);
         }
 
         destino->tipo = NORMAL;
@@ -187,7 +154,7 @@ int tentar_movimento(No *destino, Jogador *jogador, Jogador *adversario) {
     return 1;
 }
 
-int contar_territorios(No *raiz, int id_jogador) {
+int contar_territorios(Territorio *raiz, int id_jogador) {
     if (raiz == NULL)
         return 0;
 
@@ -202,7 +169,7 @@ int contar_territorios(No *raiz, int id_jogador) {
  * Menu de ações do jogador.
  * Loop continua até que uma ação que passa o turno seja executada.
  */
-void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
+void turno_jogador(Territorio *raiz, Jogador *jogador, Jogador *adversario) {
     int turno_concluido = 0;
 
     while (!turno_concluido) {
@@ -220,10 +187,10 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
                jogador->atual->escudo);
         printf("%sAtaque: %d%s | %sEscudos: %d%s | %sChaves: %d/2%s\n",
                COR_VERMELHO,
-               jogador_ataque(jogador),
+               ataque(jogador),
                COR_RESET,
                COR_VERDE,
-               jogador_escudos_disponiveis(jogador),
+               escudos(jogador),
                COR_RESET,
                COR_AMARELO,
                jogador->chave1_dominada + jogador->chave2_dominada,
@@ -231,14 +198,14 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
         printf("%s========================================%s\n\n", COR_AZUL, COR_RESET);
 
         printf("Movimentação:\n\n");
-        printf("1 - CIMA (%s)\n", jogador->atual->pai);
+        printf("1 - CIMA (%s)\n", jogador->atual->pai ? jogador->atual->pai->nome : "N/A");
         if (jogador->atual->esquerda)
             printf("2 - BAIXO ESQUERDA (%s)\n", jogador->atual->esquerda->nome);
         if (jogador->atual->direita)
             printf("3 - BAIXO DIREITA (%s)\n", jogador->atual->direita->nome);
 
-        No *lateral_esq = buscar_vizinho_esquerda(raiz, jogador->atual);
-        No *lateral_dir = buscar_vizinho_direita(raiz, jogador->atual);
+        Territorio *lateral_esq = buscarIrmaoEsquerda(raiz, jogador->atual);
+        Territorio *lateral_dir = buscarIrmaoDireita(raiz, jogador->atual);
 
         if (lateral_esq)
             printf("4 - LATERAL ESQUERDA (%s)\n", lateral_esq->nome);
@@ -295,7 +262,7 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
             break;
 
         case 4: // Movimento lateral para esquerda
-            No *lateral_esq = buscar_vizinho_esquerda(raiz, jogador->atual);
+            Territorio *lateral_esq = buscarIrmaoEsquerda(raiz, jogador->atual);
             if (lateral_esq) {
                 if (tentar_movimento(lateral_esq, jogador, adversario)) {
                     turno_concluido = 1;
@@ -306,7 +273,7 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
             break;
 
         case 5: // Movimento lateral para direita
-            No *lateral_dir = buscar_vizinho_direita(raiz, jogador->atual);
+            Territorio *lateral_dir = buscarIrmaoDireita(raiz, jogador->atual);
             if (lateral_dir) {
                 if (tentar_movimento(lateral_dir, jogador, adversario)) {
                     turno_concluido = 1;
@@ -317,8 +284,8 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
             break;
 
         case 6: // Colocar escudo
-            if (jogador_escudos_disponiveis(jogador) > 0) {
-                lista_remover(jogador->inventario, "escudo");
+            if (escudos(jogador) > 0) {
+                removerItem(jogador->inventario, "escudo");
                 jogador->atual->escudo++;
                 printf("Escudo colocado! Escudos (%s): %d\n", jogador->atual->nome, jogador->atual->escudo);
                 turno_concluido = 1; // Colocar escudo passa o turno
@@ -333,7 +300,7 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
 
         case 7: // Ver mapa (NÃO passa o turno)
             printf("\n=== MAPA DA ARVORE ===\n");
-            arvore_imprimir(raiz, 0);
+            imprimirMundo(raiz, 0);
             pressionar_enter();
             break;
 
@@ -342,8 +309,8 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
             printf("Nome: %s (J%d)\n", adversario->nome, adversario->id);
             printf("Território: %s\n", adversario->atual->nome);
             printf("Chaves: %d/2\n", adversario->chave1_dominada + adversario->chave2_dominada);
-            printf("Ataque: %d\n", jogador_ataque(adversario));
-            printf("Escudos: %d\n", jogador_escudos_disponiveis(adversario));
+            printf("Ataque: %d\n", ataque(adversario));
+            printf("Escudos: %d\n", escudos(adversario));
 
             pressionar_enter();
             break;
@@ -369,7 +336,7 @@ void turno_jogador(No *raiz, Jogador *jogador, Jogador *adversario) {
  * - Dominar ambas as CHAVES
  * - Estar no Nucleo-X
  */
-int verificar_vitoria(Jogador *jogador, No *raiz) {
+int verificar_vitoria(Jogador *jogador, Territorio *raiz) {
     if (jogador->chave1_dominada && jogador->chave2_dominada && jogador->atual == raiz) {
         return 1;
     }
@@ -386,29 +353,29 @@ int main() {
     printf("%s====================================%s\n", COR_MAGENTA, COR_RESET);
     printf("Objetivo: Dominar ambas as CHAVES e conquistar o Núcleo-X!\n\n");
 
-    No *raiz = arvore_construir_completa();
+    Territorio *raiz = criarMundo();
     raiz_global = raiz; // Salvar raiz global
 
     // Identificar nós CHAVE
-    chave1_global = buscar_no_chave(raiz, 1);
-    chave2_global = buscar_no_chave(raiz, 2);
+    chave1_global = buscarChave(raiz, 1);
+    chave2_global = buscarChave(raiz, 2);
 
     printf("Territórios CHAVE:\n");
     printf("  CHAVE 1: %s\n", chave1_global ? chave1_global->nome : "N/A");
     printf("  CHAVE 2: %s\n", chave2_global ? chave2_global->nome : "N/A");
 
     // Posicionar jogadores
-    No *spawn1 = buscar_folha_esquerda(raiz);
-    No *spawn2 = buscar_folha_direita(raiz);
+    Territorio *spawn1 = buscarBaseEsquerda(raiz);
+    Territorio *spawn2 = buscarBaseDireita(raiz);
 
-    Jogador *j1 = jogador_criar("Jogador 1", 1, spawn1);
-    Jogador *j2 = jogador_criar("Jogador 2", 2, spawn2);
+    Jogador *j1 = criarJogador("Jogador 1", 1, spawn1);
+    Jogador *j2 = criarJogador("Jogador 2", 2, spawn2);
 
     printf("\nSpawn Jogador 1: %s\n", spawn1->nome);
     printf("Spawn Jogador 2: %s\n", spawn2->nome);
 
     printf("\n=== MAPA INICIAL ===\n");
-    arvore_imprimir(raiz, 0);
+    imprimirMundo(raiz, 0);
     pressionar_enter();
 
     // Loop do jogo
@@ -465,9 +432,9 @@ int main() {
     }
 
     // Limpeza
-    jogador_destruir(j1);
-    jogador_destruir(j2);
-    arvore_liberar(raiz);
+    destruirJogador(j1);
+    destruirJogador(j2);
+    destruirMundo(raiz);
 
     printf("\nObrigado por jogar Code Battle!\n");
     return 0;

@@ -1,16 +1,12 @@
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
-// Detecção de plataforma
 #ifdef _WIN32
-#include <windows.h>
 #define LIMPAR_TELA "cls"
 #else
-#include <unistd.h>
 #define LIMPAR_TELA "clear"
 #endif
 
-// Cores da interface
 #define COR_RESET "\033[0m"
 #define COR_VERMELHO "\033[1;31m"
 #define COR_VERDE "\033[1;32m"
@@ -20,13 +16,13 @@
 #define COR_CIANO "\033[1;36m"
 #define COR_BRANCO "\033[1;37m"
 
-/// @brief
+/// @brief Limpa a tela do terminal.
 void limpar_tela(void);
 
-/// @brief
+/// @brief Limpa o buffer de entrada.
 void limpar_buffer(void);
 
-/// @brief
+/// @brief Aguarda o usuário pressionar a tecla Enter.
 void pressionar_enter(void);
 
 #endif // TERMINAL_H

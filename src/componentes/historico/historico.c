@@ -16,7 +16,7 @@ Historico *inicializarHistorico() {
     return historico;
 }
 
-void empilharHistorico(Historico *historico, struct No *territorio) {
+void empilharHistorico(Historico *historico, Territorio *territorio) {
     Acao *acao = (Acao *)malloc(sizeof(Acao));
 
     if (acao == NULL) {
@@ -29,13 +29,13 @@ void empilharHistorico(Historico *historico, struct No *territorio) {
     historico->topo = acao;
 }
 
-struct No *desempilharHistorico(Historico *historico) {
+Territorio *desempilharHistorico(Historico *historico) {
     if (historico->topo == NULL) {
         return NULL;
     }
 
     Acao *acao = historico->topo;
-    struct No *territorio = acao->territorio;
+    Territorio *territorio = acao->territorio;
 
     historico->topo = acao->proximo;
 
@@ -44,7 +44,7 @@ struct No *desempilharHistorico(Historico *historico) {
     return territorio;
 }
 
-struct No *topoHistorico(Historico *historico) {
+Territorio *topoHistorico(Historico *historico) {
     if (historico->topo == NULL) {
         return NULL;
     }
