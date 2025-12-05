@@ -1,7 +1,7 @@
 #ifndef HISTORICO_H
 #define HISTORICO_H
 
-#include "../mundo.h"
+#include "componentes/mundo/mundo.h"
 
 /// @file historico.h
 /// @brief Definições e funções para o histórico de ações.

@@ -1,9 +1,9 @@
 #ifndef JOGADOR_H
 #define JOGADOR_H
 
-#include "mundo.h"
-#include "tads/historico.h"
-#include "tads/inventario.h"
+#include "componentes/historico/historico.h"
+#include "componentes/inventario/inventario.h"
+#include "componentes/mundo/mundo.h"
 
 /// @brief Estrutura que representa um jogador no jogo.
 typedef struct Jogador {
@@ -35,7 +35,7 @@ int escudos(Jogador *jogador);
 
 /// @brief
 /// @param jogador
-void imprimirStatus(Jogador *jogador);
+void imprimirJogador(Jogador *jogador);
 
 /// @brief
 /// @param jogador

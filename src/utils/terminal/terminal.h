@@ -1,3 +1,6 @@
+#ifndef TERMINAL_H
+#define TERMINAL_H
+
 // Detecção de plataforma
 #ifdef _WIN32
 #include <windows.h>
@@ -17,7 +20,13 @@
 #define COR_CIANO "\033[1;36m"
 #define COR_BRANCO "\033[1;37m"
 
-// Funções para terminal
+/// @brief
 void limpar_tela(void);
+
+/// @brief
 void limpar_buffer(void);
-void pressionar_enter();
+
+/// @brief
+void pressionar_enter(void);
+
+#endif // TERMINAL_H
