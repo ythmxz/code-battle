@@ -271,7 +271,7 @@ void imprimirMundo(Territorio *territorio, int nivel) {
     }
 
     for (int i = 0; i < nivel; i++) {
-        printf("  ");
+        printf("|--");
     }
 
     const char *tipoNome[] = {"NORMAL", "RECURSO", "CHAVE"};

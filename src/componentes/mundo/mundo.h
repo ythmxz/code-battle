@@ -7,7 +7,7 @@
 /// @brief Definições e funções para a árvore de territórios.
 
 /// @brief Tipos de territórios.
-typedef enum { NORMAL = 0, RECURSO = 1, CHAVE = 2 } TipoTerritorio;
+typedef enum { NORMAL = 0, RECURSO = 1, CHAVE = 2, BATALHA = 3 } TipoTerritorio;
 
 /// @brief Estrutura de um território.
 typedef struct Territorio {
