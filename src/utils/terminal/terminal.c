@@ -14,6 +14,6 @@ void limparBuffer() {
 }
 
 void prompt() {
-    printf("\n%s[Pressione ENTER para continuar]%s\n", COR_CIANO, COR_RESET);
+    printf("%s[Pressione ENTER para continuar]%s\n", COR_CIANO, COR_RESET);
     getchar();
 }

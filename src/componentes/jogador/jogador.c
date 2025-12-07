@@ -17,8 +17,8 @@ Jogador *criarJogador(const char *nome, int id, Territorio *inicio) {
     jogador->atual = inicio;
     jogador->inventario = inicializarInventario();
     jogador->historico = inicializarHistorico();
-    jogador->chave1_dominada = 0;
-    jogador->chave2_dominada = 0;
+    jogador->chave1Dominada = 0;
+    jogador->chave2Dominada = 0;
 
     if (inicio != NULL) {
         inicio->ocupado = id;
@@ -44,10 +44,9 @@ void imprimirJogador(Jogador *jogador) {
     printf("Território: %s\n", jogador->atual->nome);
     printf("Ataque: %d\n", ataque(jogador));
     printf("Escudos: %d\n", escudos(jogador));
-    printf("Chaves: %d/2\n", jogador->chave1_dominada + jogador->chave2_dominada);
-    printf("Inventário:\n");
+    printf("Chaves: %d/2\n\n", jogador->chave1Dominada + jogador->chave2Dominada);
+    printf("Inventário:\n\n");
     imprimirInventario(jogador->inventario);
-    printf("===========================\n");
 }
 
 int ataque(Jogador *jogador) {

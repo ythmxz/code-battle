@@ -12,8 +12,8 @@ typedef struct Jogador {
     Territorio *atual;
     Inventario *inventario;
     Historico *historico;
-    int chave1_dominada;
-    int chave2_dominada;
+    int chave1Dominada;
+    int chave2Dominada;
 } Jogador;
 
 /// @brief Cria um novo jogador.
