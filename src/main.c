@@ -15,7 +15,7 @@ Territorio *raiz_global = NULL;
 Territorio *chave1_global = NULL;
 Territorio *chave2_global = NULL;
 
-int tentar_movimento(Territorio *destino, Jogador *jogador, Jogador *adversario) {
+int tentarMovimento(Territorio *destino, Jogador *jogador, Jogador *adversario) {
     if (destino == NULL) {
         printf("%sMOVIMENTO INVÁLIDO%s\n", COR_VERMELHO, COR_RESET);
         printf("%sO destino não existe.%s\n", COR_VERMELHO, COR_RESET);
@@ -154,13 +154,13 @@ int tentar_movimento(Territorio *destino, Jogador *jogador, Jogador *adversario)
     return 1;
 }
 
-int contar_territorios(Territorio *raiz, int id_jogador) {
+int contarTerritorios(Territorio *raiz, int id_jogador) {
     if (raiz == NULL)
         return 0;
 
     int contador = (raiz->ocupado == id_jogador) ? 1 : 0;
-    contador += contar_territorios(raiz->esquerda, id_jogador);
-    contador += contar_territorios(raiz->direita, id_jogador);
+    contador += contarTerritorios(raiz->esquerda, id_jogador);
+    contador += contarTerritorios(raiz->direita, id_jogador);
 
     return contador;
 }
@@ -169,11 +169,11 @@ int contar_territorios(Territorio *raiz, int id_jogador) {
  * Menu de ações do jogador.
  * Loop continua até que uma ação que passa o turno seja executada.
  */
-void turno_jogador(Territorio *raiz, Jogador *jogador, Jogador *adversario) {
+void turnoJogador(Territorio *raiz, Jogador *jogador, Jogador *adversario) {
     int turno_concluido = 0;
 
     while (!turno_concluido) {
-        limpar_tela();
+        limparTela();
 
         printf("%s========================================%s\n", COR_AZUL, COR_RESET);
         printf("%sTurno: %s (J%d)%s\n", COR_BRANCO, jogador->nome, jogador->id, COR_RESET);
@@ -223,64 +223,64 @@ void turno_jogador(Territorio *raiz, Jogador *jogador, Jogador *adversario) {
 
         int escolha = 0;
         if (scanf("%d", &escolha) != 1) {
-            limpar_buffer();
+            limparBuffer();
             printf("OPÇÃO INVÁLIDA.\n");
-            pressionar_enter();
+            prompt();
             continue;
         }
-        limpar_buffer();
+        limparBuffer();
 
         switch (escolha) {
         case 1: // Mover para pai
             if (jogador->atual->pai) {
-                if (tentar_movimento(jogador->atual->pai, jogador, adversario)) {
+                if (tentarMovimento(jogador->atual->pai, jogador, adversario)) {
                     turno_concluido = 1; // Movimento passa o turno
                 }
             }
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 2: // Mover para filho esquerdo
             if (jogador->atual->esquerda) {
-                if (tentar_movimento(jogador->atual->esquerda, jogador, adversario)) {
+                if (tentarMovimento(jogador->atual->esquerda, jogador, adversario)) {
                     turno_concluido = 1;
                 }
             }
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 3: // Mover para filho direito
             if (jogador->atual->direita) {
-                if (tentar_movimento(jogador->atual->direita, jogador, adversario)) {
+                if (tentarMovimento(jogador->atual->direita, jogador, adversario)) {
                     turno_concluido = 1;
                 }
             }
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 4: // Movimento lateral para esquerda
             Territorio *lateral_esq = buscarIrmaoEsquerda(raiz, jogador->atual);
             if (lateral_esq) {
-                if (tentar_movimento(lateral_esq, jogador, adversario)) {
+                if (tentarMovimento(lateral_esq, jogador, adversario)) {
                     turno_concluido = 1;
                 }
             }
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 5: // Movimento lateral para direita
             Territorio *lateral_dir = buscarIrmaoDireita(raiz, jogador->atual);
             if (lateral_dir) {
-                if (tentar_movimento(lateral_dir, jogador, adversario)) {
+                if (tentarMovimento(lateral_dir, jogador, adversario)) {
                     turno_concluido = 1;
                 }
             }
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 6: // Colocar escudo
@@ -295,13 +295,13 @@ void turno_jogador(Territorio *raiz, Jogador *jogador, Jogador *adversario) {
                 printf("Escudos insuficientes!\n");
             }
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 7: // Ver mapa (NÃO passa o turno)
             printf("\n=== MAPA DA ARVORE ===\n");
             imprimirMundo(raiz, 0);
-            pressionar_enter();
+            prompt();
             break;
 
         case 8: // Ver status do adversário (NÃO passa o turno)
@@ -312,31 +312,26 @@ void turno_jogador(Territorio *raiz, Jogador *jogador, Jogador *adversario) {
             printf("Ataque: %d\n", ataque(adversario));
             printf("Escudos: %d\n", escudos(adversario));
 
-            pressionar_enter();
+            prompt();
             break;
 
         case 9: // Passar turno explicitamente
             printf("%s passou.\n", jogador->nome);
             turno_concluido = 1;
 
-            pressionar_enter();
+            prompt();
             break;
 
         default:
             printf("OPÇÃO INVÁLIDA.\n");
 
-            pressionar_enter();
+            prompt();
             break;
         }
     }
 }
 
-/**
- * Verifica condição de vitória:
- * - Dominar ambas as CHAVES
- * - Estar no Nucleo-X
- */
-int verificar_vitoria(Jogador *jogador, Territorio *raiz) {
+int verificarVitoria(Jogador *jogador, Territorio *raiz) {
     if (jogador->chave1_dominada && jogador->chave2_dominada && jogador->atual == raiz) {
         return 1;
     }
@@ -346,11 +341,9 @@ int verificar_vitoria(Jogador *jogador, Territorio *raiz) {
 
 int main() {
     srand((unsigned)time(NULL));
-    limpar_tela();
+    limparTela();
 
-    printf("%s====================================%s\n", COR_MAGENTA, COR_RESET);
-    printf("%s       CODE BATTLE - v2.1%s\n", COR_MAGENTA, COR_RESET);
-    printf("%s====================================%s\n", COR_MAGENTA, COR_RESET);
+    printf("%sCODE BATTLE%s\n\n", COR_MAGENTA, COR_RESET);
     printf("Objetivo: Dominar ambas as CHAVES e conquistar o Núcleo-X!\n\n");
 
     Territorio *raiz = criarMundo();
@@ -376,7 +369,7 @@ int main() {
 
     printf("\n=== MAPA INICIAL ===\n");
     imprimirMundo(raiz, 0);
-    pressionar_enter();
+    prompt();
 
     // Loop do jogo
     int turno = 1;
@@ -386,10 +379,10 @@ int main() {
         Jogador *atual = (turno % 2 == 1) ? j1 : j2;
         Jogador *oponente = (turno % 2 == 1) ? j2 : j1;
 
-        turno_jogador(raiz, atual, oponente);
+        turnoJogador(raiz, atual, oponente);
 
-        if (verificar_vitoria(atual, raiz)) {
-            limpar_tela();
+        if (verificarVitoria(atual, raiz)) {
+            limparTela();
             printf("\n\n");
             printf("%s****************************************%s\n", COR_VERDE, COR_RESET);
             printf("%s%s VENCEU O JOGO!%s\n", COR_VERDE, atual->nome, COR_RESET);
@@ -403,14 +396,14 @@ int main() {
 
         // Verificar limite de turnos
         if (turno >= LIMITE_TURNOS) {
-            limpar_tela();
+            limparTela();
             printf("\n\n");
             printf("%s****************************************%s\n", COR_AMARELO, COR_RESET);
             printf("%sLIMITE DE TURNOS ATINGIDO!%s\n", COR_AMARELO, COR_RESET);
             printf("%s****************************************%s\n", COR_AMARELO, COR_RESET);
 
-            int terr_j1 = contar_territorios(raiz, 1);
-            int terr_j2 = contar_territorios(raiz, 2);
+            int terr_j1 = contarTerritorios(raiz, 1);
+            int terr_j2 = contarTerritorios(raiz, 2);
 
             printf("\n%sContagem de territórios:%s\n", COR_BRANCO, COR_RESET);
             printf("  %s: %d territórios\n", j1->nome, terr_j1);

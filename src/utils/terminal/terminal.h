@@ -17,12 +17,12 @@
 #define COR_BRANCO "\033[1;37m"
 
 /// @brief Limpa a tela do terminal.
-void limpar_tela(void);
+void limparTela(void);
 
 /// @brief Limpa o buffer de entrada.
-void limpar_buffer(void);
+void limparBuffer(void);
 
 /// @brief Aguarda o usuário pressionar a tecla Enter.
-void pressionar_enter(void);
+void prompt(void);
 
 #endif // TERMINAL_H

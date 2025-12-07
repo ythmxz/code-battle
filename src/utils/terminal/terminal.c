@@ -3,17 +3,17 @@
 
 #include "terminal.h"
 
-void limpar_tela() {
+void limparTela() {
     system(LIMPAR_TELA);
 }
 
-void limpar_buffer() {
+void limparBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF)
         ;
 }
 
-void pressionar_enter() {
+void prompt() {
     printf("\n%s[Pressione ENTER para continuar]%s\n", COR_CIANO, COR_RESET);
     getchar();
 }
